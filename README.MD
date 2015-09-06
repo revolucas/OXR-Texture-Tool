@@ -61,6 +61,7 @@ Merge:
 	D. Issues:
 		1. This tool isn't perfect. If an identical texture from two different ui_icon_equipment.dds come from sections of dissimilar names it's possible you can end up with duplicates on the sheet. You will have to manually fix this yourself. 
 		   Simply fix this by removing one of the textures and removing it's information from the shared.ltx. Then add the section(s) to the priority 1 shared.ltx.
+		2. Sometimes it's best just to manually merge by copying the unpacked icons over the specific icons you want to change. 
 	
 ==========
   Credits:
