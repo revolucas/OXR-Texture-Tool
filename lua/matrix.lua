@@ -98,6 +98,8 @@ function matrix(w,h)
 		
 		if (_x > w or _y > h) then
 			return nil,nil,true
+		elseif (_x == w and width > 1) or (_y == h and height > 1) then 
+			return nil,nil,true
 		end
 		
 		for y=_y,h do

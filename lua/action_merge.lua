@@ -96,7 +96,7 @@ function action_merge_ui_equipment_icons()
 					sections_by_alias[alias] = {}
 				end
 				
-				if (alias_by_section[k] and sections_by_alias[alias_by_section[k]]) then 
+				if (sections_by_alias[alias_by_section[k]]) then 
 					sections_by_alias[alias_by_section[k]][k] = nil
 				end
 				
@@ -112,6 +112,8 @@ function action_merge_ui_equipment_icons()
 	local first,w,h,s_x,s_y,x,y,n
 	local dont_use_suggested = {}
 	local function make_composite(alias,sort_by_size)
+		x = nil
+		y = nil
 		--print("debug make composite")
 		
 		local p,fn,s_ltx
