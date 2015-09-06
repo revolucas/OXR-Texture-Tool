@@ -84,9 +84,9 @@ function action_unpack_ui_equipment_icons(index)
 		if not (alias[w][h][x][y]) then 
 			alias[w][h][x][y] = sec
 			
-			lfs.mkdir(output_dir .. "\\" .. sec)
+			--lfs.mkdir(output_dir .. "\\" .. sec)
 			
-			local fn =  output_dir .. "\\" .. sec .. "\\" .. sec .. ".png"
+			local fn =  output_dir .. "\\" .. sec .. ".png"
 			local exists = os.rename(fn,fn) or false
 			
 			if (exists ~= true or overwrite) then

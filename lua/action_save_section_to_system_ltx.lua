@@ -1,4 +1,5 @@
-﻿function action_save_section_to_system_ltx(dir,geometry)
+﻿
+function action_save_section_to_system_ltx(dir,geometry)
 	local function on_execute(path,filename)
 		local fullpath = path.."\\"..filename
 		local ltx = io.open(fullpath,"rb")

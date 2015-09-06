@@ -16,8 +16,8 @@ function action_merge_ui_equipment_icons()
 		end
 	end 
 	
-	if (#input <= 1) then 
-		Msgbox("Merging requires atleast 2 input sources!")
+	if (#input <= 0) then 
+		Msgbox("Merging requires atleast 1 input source!")
 		return
 	end 
 	
@@ -64,8 +64,8 @@ function action_merge_ui_equipment_icons()
 		table.insert(shared,{ltx=ltx,path=input[i]})
 	end 
 	
-	if (#shared < 2) then 
-		Msgbox("Unable to load shared.ltx")
+	if (#shared ~= #input) then 
+		Msgbox("Cannot load shared.ltx from all input sources")
 		return
 	end 
 	
@@ -79,72 +79,73 @@ function action_merge_ui_equipment_icons()
 	local max_col = round(max_h/50)
 	local m = matrix(max_row,max_col)
 	
-	local sections_by_alias = {}
 	local alias_by_section = {}
-	
-	local icon_sections_list = {}
+	local sections_by_alias = {}
 	local max_count = 0
 	local function make_list(p,fn,ltx)
 		local fullpath = p .. "\\" .. fn
-		local alias = get_current_dir(p)
+		local alias = fn:sub(0,-5)
 		local seclist = ltx:GetKeys(alias)
 		if not (seclist) then 
 			log("Error: section %s is empty!",alias)
 			return
 		end
-		
-		local sec
-		local t={}
 		for k,v in pairs(seclist) do
 			if (k ~= "_suggested_x" and k ~= "_suggested_y" and k ~= "_grid_width" and k ~= "_grid_height") then
 				if not (sections_by_alias[alias]) then 
 					sections_by_alias[alias] = {}
 				end
-				sections_by_alias[alias][k] = {p=p,fn=fn,ltx=ltx}
+				
+				if (alias_by_section[k] and sections_by_alias[alias_by_section[k]]) then 
+					sections_by_alias[alias_by_section[k]][k] = nil
+				end
+				
 				alias_by_section[k] = alias
+				sections_by_alias[alias][k] = {p=p,fn=fn,ltx=ltx}		
+			
+				max_count = max_count + 1
 			end
 		end
-		
-	
-		
-		if not (icon_sections_list[sec]) then
-			icon_sections_list[sec] = {p=p,fn=fn,ltx=ltx}
-		else 
-			local new_ltx = ltx:GetValue(alias,"_grid_width",2) and ltx or icon_sections_list[alias].ltx:GetValue(sec,"_grid_width",2) and icon_sections_list[alias].ltx
-			icon_sections_list[sec] = {p=p,fn=fn,ltx=new_ltx}
-		end
-		max_count = max_count + 1
 	end
 	
 	local c = 0
 	local first,w,h,s_x,s_y,x,y,n
 	local dont_use_suggested = {}
-	local function make_composite(list,sec,sort_by_size)
-		if not (list[sec].ltx) then
-			Msgbox("Error: list[sec].ltx is nil!")
+	local function make_composite(alias,sort_by_size)
+		--print("debug make composite")
+		
+		local p,fn,s_ltx
+		for _sec,tbl in pairs(sections_by_alias[alias]) do 
+			s_ltx = tbl.ltx
+			p = tbl.p
+			fn = tbl.fn
+			break
+		end 
+		
+		if not (s_ltx) then
+			log("Error: s_ltx is nil!")
 			return
 		end
-		local alias = get_current_dir(list[sec].p)
-		if (sec == "___upgr_icon1") then 
+
+		if (alias == "___upgr_icon1") then 
 			w = 1
 			h = 1
-		elseif (sec == "___upgr_icon2") then 
+		elseif (alias == "___upgr_icon2") then 
 			w = 1
 			h = 1
 		else
-			w = list[sec].ltx:GetValue(alias,"_grid_width",2)
-			h = list[sec].ltx:GetValue(alias,"_grid_height",2)
+			w = s_ltx:GetValue(alias,"_grid_width",2)
+			h = s_ltx:GetValue(alias,"_grid_height",2)
 		end
 
 		if (w and h) then
-
-			local fullpath = list[sec].p .. "\\" .. list[sec].fn
-			if (sec == "___upgr_icon1" or sec == "___upgr_icon2") then 
-				s_x = list[sec].ltx:GetValue(alias,"_suggested_x",2)
-				s_y = list[sec].ltx:GetValue(alias,"_suggested_y",2)		
+			local fullpath = p .. "\\" .. fn
+			if (alias == "___upgr_icon1" or alias == "___upgr_icon2") then 
+				s_x = s_ltx:GetValue(alias,"_suggested_x",2)
+				s_y = s_ltx:GetValue(alias,"_suggested_y",2)		
 			else 
-				s_x = not ignore_suggested and list[sec].ltx:GetValue(alias,"_suggested_x",2)
-				s_y = not ignore_suggested and list[sec].ltx:GetValue(alias,"_suggested_y",2)
+				s_x = not ignore_suggested and s_ltx:GetValue(alias,"_suggested_x",2)
+				s_y = not ignore_suggested and s_ltx:GetValue(alias,"_suggested_y",2)
 			end
 
 			if (h <= sort_by_size.h and w <= sort_by_size.w) then
@@ -163,9 +164,7 @@ function action_merge_ui_equipment_icons()
 			if (n == true) then 
 				-- don't remove index in list
 			elseif (x and y) then
-				list[sec] = nil
 				c = c + 1
-				
 				local real_x = (x-1)*50
 				local real_y = (y-1)*50
 				local real_w = w*50
@@ -183,17 +182,23 @@ function action_merge_ui_equipment_icons()
 						RunWait(lfs.currentdir() .. [[/bin/ImageMagick/composite.exe -geometry ]] .. real_w .. "x" .. real_h .. "+" .. real_x .. "+" .. real_y .. [[ "]] .. fullpath .. [[" "]] .. output_dir .. [[/new_ui_icon_equipment.png" "]] .. output_dir .. [[/new_ui_icon_equipment.png"]],"", "Hide UseErrorLevel")
 					end
 				end
-				
-				if (overwrite == true and sec ~= "___upgr_icon1" and sec ~= "___upgr_icon2") then
-					action_save_section_to_system_ltx(gamedata_dir.."\\configs",{section=sec,x=x-1,y=y-1,w=w,h=h})
+				for _section,v in pairs (sections_by_alias[alias]) do
+					if (overwrite == true and sec ~= "___upgr_icon1" and sec ~= "___upgr_icon2") then
+						action_save_section_to_system_ltx(gamedata_dir.."\\configs",{section=_section,x=x-1,y=y-1,w=w,h=h})
+					end 
+					sections_by_alias[alias][_section] = nil
 				end
 			else
-				list[sec] = nil
+				for _section,v in pairs (sections_by_alias[alias]) do
+					sections_by_alias[alias][_section] = nil
+				end
 				c = c + 1
 				log("Failed to find free space on canvas! Use a larger canvas size! [%s] %s",sec,fullpath)
 			end
 		else
-			list[sec] = nil
+			for _section,v in pairs (sections_by_alias[alias]) do
+				sections_by_alias[alias][_section] = nil
+			end
 			c = c + 1
 			log("Failed to get valid width and/or height! [%s] %s",sec,fullpath)
 		end
@@ -204,9 +209,26 @@ function action_merge_ui_equipment_icons()
 		RunWait(lfs.currentdir() .. [[/bin/ImageMagick/convert.exe -size ]] .. canvas_size .. [[ xc:none canvas_ui_icon_equipment.png]]," ", "Hide UseErrorLevel")
 	end
 	
+	--print("before makelist")
 	for n=#shared,1,-1 do
 		recurse_subdirectories_and_execute(shared[n].path,{"png"},make_list,shared[n].ltx)
 	end
+	
+	--print("after makelist")
+	
+	-- test not needed
+	--[[
+	local _secs = {}
+	for alias,tbl in pairs(sections_by_alias) do 
+		for sec,v in pairs(tbl) do
+			if (_secs[sec]) then 
+				Msgbox("Duplicate sections detected from directories " .. _secs[sec] .. " and " .. alias)
+			else
+				_secs[sec] = alias
+			end
+		end
+	end
+	--]]
 	
 	if (max_count == 0) then
 		Msgbox("Failed to make a list using input directory and shared.ltx!")
@@ -220,8 +242,7 @@ function action_merge_ui_equipment_icons()
 	Gui("2:+0x300000")
 	GroupAdd("SpriteSheet","ui_equipment_icon")
 	
-	local sort_by_size = {w=1,h=1}
-	order_by_class_and_execute(ini,icon_sections_list,make_composite,sort_by_size)
+	order_by_class_and_execute(ini,sections_by_alias,make_composite)
 	
 	GuiControl("", "MergeProgress", "0")
 	ahkFunction("UpdateScrollBars","2","1024","768")

@@ -215,6 +215,10 @@ WM_NCHITTEST(wParam, lParam)
     ; else let default hit-testing be done
 }
 
+LaunchSIE:
+	Run, bin/SIE_0.6.5_english.exe,%A_WorkingDir%
+Return
+
 Dummy:
 ;do nothing
 Return

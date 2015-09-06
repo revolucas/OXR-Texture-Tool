@@ -55,3 +55,4 @@ BrowseSystemLTX2:
 	GuiControl,,SystemLTX2,%SystemLTX2%
 	Gui, Submit, NoHide
 Return
+

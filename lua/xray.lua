@@ -272,7 +272,7 @@ function get_item_sections_list(ini,reload)
 	return item_list
 end
 
-function order_by_class_and_execute(lookup,icon_sections_list,func,sort_by_size)
+function order_by_class_and_execute(lookup,sections_by_alias,func)
 	if not (lookup) then 
 		log("order_by_class_and_execute: lookup ini is nil!")
 		return
@@ -285,17 +285,7 @@ function order_by_class_and_execute(lookup,icon_sections_list,func,sort_by_size)
 		"UNKNOWN",
 		"II_BOLT",
 		"TORCH_S",
-		"S_PDA",
-		"D_PDA",
-		"II_DOC",
-		"II_ATTCH",
-		"II_BTTCH",
-
-		"DET_SIMP",
-		"DET_ADVA",
-		"DET_ELIT",
-		"DET_SCIE",
-
+		
 		"ARTEFACT",
 		"SCRPTART",
 
@@ -306,6 +296,17 @@ function order_by_class_and_execute(lookup,icon_sections_list,func,sort_by_size)
 		"II_MEDKI",
 		"II_BANDG",
 		"II_ANTIR",
+		
+		"S_PDA",
+		"D_PDA",
+		"II_DOC",
+		"II_ATTCH",
+		"II_BTTCH",
+
+		"DET_SIMP",
+		"DET_ADVA",
+		"DET_ELIT",
+		"DET_SCIE",
 
 		"G_F1_S",
 		"G_RGD5_S",
@@ -338,21 +339,34 @@ function order_by_class_and_execute(lookup,icon_sections_list,func,sort_by_size)
 		"E_HLMET"
 	}
 
+	local function can_quit()
+		for k,tbl in pairs(sections_by_alias) do
+			if not (is_empty(tbl)) then 
+				return false
+			end
+		end
+		return true
+	end 
+	
 	local __c,flip
-	while (not is_empty(icon_sections_list)) do
+	local sort_by_size = {w=1,h=1}
+	while (not can_quit()) do
 		__c = {}
-		for section,val in pairs(icon_sections_list) do
-			local cls = lookup:GetValue(key,"class",3)
-			if (cls and m_classes[cls] == true) then
-				if not (__c[cls]) then
-					__c[cls] = {}
+		for alias,tbl in pairs(sections_by_alias) do
+			for section,v in pairs(tbl) do
+				local cls = lookup:GetValue(section,"class",3)
+				if (cls and m_classes[cls] == true) then
+					if not (__c[cls]) then
+						__c[cls] = {}
+					end
+					table.insert(__c[cls],alias)
+				else 
+					if not (__c["UNKNOWN"]) then
+						__c["UNKNOWN"] = {}
+					end
+					table.insert(__c["UNKNOWN"],alias)
 				end
-				table.insert(__c[cls],section)
-			else 
-				if not (__c["UNKNOWN"]) then
-					__c["UNKNOWN"] = {}
-				end
-				table.insert(__c["UNKNOWN"],section)
+				break -- only need one section per alias since values are the same
 			end
 		end
 
@@ -363,17 +377,17 @@ function order_by_class_and_execute(lookup,icon_sections_list,func,sort_by_size)
 		for i,cls in pairs(__cls) do
 			if (__c[cls]) then
 				for k,sec in pairs(__c[cls]) do
-					func(icon_sections_list,sec,sort_by_size)
+					func(sec,sort_by_size)
 				end
 			end
 		end
 		
 		if not (flip) then 
 			flip = true
-			sort_by_size.h = sort_by_size.h + 1
+			sort_by_size.w = sort_by_size.w + 1
 		else 
 			flip = false 
-			sort_by_size.w = sort_by_size.w + 1
+			sort_by_size.h = sort_by_size.h + 1
 		end 
 	end
 end

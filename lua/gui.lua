@@ -1,9 +1,9 @@
 -- ; Author: Alundaio
 
 function initialize_gui()
+	Gui("Add","Button","gLaunchSIE" .. " x322 w100 h20 y0","Launch SIE") -- Laucnh Stalker Icon Editor
 	-- Tabs
-	Gui("Add", "Tab2", "vTabName x-8 y-1 w760 h550", "Unpack|Repack|Merge|Options")
-	
+	Gui("Add", "Tab2", "vTabName x-8 y-1 w760 h550", "Unpack|Repack|Merge")
 	Gui("Tab", "Unpack")
 		local y_offset = 25
 		for i=1,2 do

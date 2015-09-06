@@ -13,11 +13,11 @@ Unpacking:
 	A. How-to:
 		1. First select an input texture using the browse button. The texture can be in any image format, select the ui_icon_equipment
 		2. Next, select the system.ltx of the mod that belongs to this ui_icon_equipment. You must have unpacked the gamedata for this to work!
-		3. Select the output directory. This is where new individual directories will be created using an alias that resembles the first found section name using the icon.
+		3. Select the output directory. This is where new individual textures (.png) will be created using an alias that resembles the first found section name using the icon.
 		   A file named shared.ltx will be created in the main output directory. Here is a list of sections by the alias names. In each section will be vital information used
 		   for repacking the icons. 
 			
-		4. Press the => button and it should start upacking and display a blue progress bar until it is finished.
+		4. Press the => button and it should start unpacking and display a blue progress bar until it is finished.
 		
 	B. Options:
 		1. Overwrite - It will overwrite existing textures in the output directory.
@@ -58,8 +58,8 @@ Merge:
 		1. Priority is important. This is the order in which conflicts are resolved. If source A and source B have the same alias, source A's icon and settings in the shared.ltx will be used.
 	
 	D. Issues:
-		1. This tool isn't perfect. If aliased directories are not the same then it's possible you can end up with duplicates on the sheet. You will have to manually fix this yourself. 
-		   Simply fix this manually by renaming the aliased directories the same name if you happen to see a duplicated icon in the draft window before committing to a final result.
+		1. This tool isn't perfect. If an identical texture from two different ui_icon_equipment.dds come from sections of dissimilar names it's possible you can end up with duplicates on the sheet. You will have to manually fix this yourself. 
+		   Simply fix this by removing one of the textures and removing it's information from the shared.ltx. Then add the section(s) to the priority 1 shared.ltx.
 	
 ==========
   Credits:

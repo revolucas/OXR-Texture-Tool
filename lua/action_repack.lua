@@ -65,64 +65,73 @@ function action_repack_ui_equipment_icons(index)
 	local max_col = round(max_h/50)
 	local m = matrix(max_row,max_col)
 	
-	local icon_sections_list = {}
+	local alias_by_section = {}
+	local sections_by_alias = {}
 	local max_count = 0
-	local function make_list(p,fn)
+	local function make_list(p,fn,ltx)
 		local fullpath = p .. "\\" .. fn
-		local alias = get_current_dir(p)
-		
+		local alias = fn:sub(0,-5) --get_current_dir(p)
 		local seclist = ltx:GetKeys(alias)
 		if not (seclist) then 
 			log("Error: section %s is empty!",alias)
 			return
 		end
-		
-		local sec
-		local t={}
 		for k,v in pairs(seclist) do
 			if (k ~= "_suggested_x" and k ~= "_suggested_y" and k ~= "_grid_width" and k ~= "_grid_height") then
-				table.insert(t,k)
+				if not (sections_by_alias[alias]) then 
+					sections_by_alias[alias] = {}
 			end
+		
+				if (alias_by_section[k] and sections_by_alias[alias_by_section[k]]) then 
+					sections_by_alias[alias_by_section[k]][k] = nil
 		end
 		
-		table.sort(t)
-		
-		sec = t[1]
-		
-		if not (sec) then 
-			log("Error: there are no sections listed in sections_share_icon of shared.ltx [%s]",p)
-			return
-		end
-		
-		icon_sections_list[sec] = {p=p,fn=fn}
+				alias_by_section[k] = alias
+				sections_by_alias[alias][k] = {p=p,fn=fn,ltx=ltx}		
+			
 		max_count = max_count + 1
+	end
+		end
 	end
 	
 	local c = 0
 	local first,w,h,s_x,s_y,x,y,n
 	local dont_use_suggested = {}
-	local function make_composite(list,sec,sort_by_size)
-		local alias = get_current_dir(list[sec].p)
+	local function make_composite(alias,sort_by_size)
+		--print("debug make composite")
 		
-		if (sec == "___upgr_icon1") then 
+		local p,fn,s_ltx
+		for _sec,tbl in pairs(sections_by_alias[alias]) do 
+			s_ltx = tbl.ltx
+			p = tbl.p
+			fn = tbl.fn
+			break
+		end 
+		
+		if not (s_ltx) then
+			log("Error: s_ltx is nil!")
+			return
+		end
+
+		if (alias == "___upgr_icon1") then 
 			w = 1
 			h = 1
-		elseif (sec == "___upgr_icon2") then 
+		elseif (alias == "___upgr_icon2") then 
 			w = 1
 			h = 1
 		else
-			w = ini:GetValue(sec,"inv_grid_width",2) or ltx:GetValue(alias,"_grid_width",2)
-			h = ini:GetValue(sec,"inv_grid_height",2) or ltx:GetValue(alias,"_grid_height",2)
+			w = s_ltx:GetValue(alias,"_grid_width",2)
+			h = s_ltx:GetValue(alias,"_grid_height",2)
 		end
 		
 		if (w and h) then
-			local fullpath = list[sec].p .. "\\" .. list[sec].fn
-			if (sec == "___upgr_icon1" or sec == "___upgr_icon2") then 
-				s_x = ltx:GetValue(alias,"_suggested_x",2)
-				s_y = ltx:GetValue(alias,"_suggested_y",2)
+			local fullpath = p .. "\\" .. fn
+			if (alias == "___upgr_icon1" or alias == "___upgr_icon2") then 
+				s_x = s_ltx:GetValue(alias,"_suggested_x",2)
+				s_y = s_ltx:GetValue(alias,"_suggested_y",2)		
 			else 
-				s_x = not ignore_suggested and ltx:GetValue(alias,"_suggested_x",2)
-				s_y = not ignore_suggested and ltx:GetValue(alias,"_suggested_y",2)
+				s_x = not ignore_suggested and s_ltx:GetValue(alias,"_suggested_x",2)
+				s_y = not ignore_suggested and s_ltx:GetValue(alias,"_suggested_y",2)
 			end
 			
 			if (h <= sort_by_size.h and w <= sort_by_size.w) then
@@ -141,9 +150,7 @@ function action_repack_ui_equipment_icons(index)
 			if (n == true) then 
 				-- don't remove index in list
 			elseif (x and y) then
-				list[sec] = nil
 				c = c + 1
-				
 				local real_x = (x-1)*50
 				local real_y = (y-1)*50
 				local real_w = w*50
@@ -161,17 +168,23 @@ function action_repack_ui_equipment_icons(index)
 						RunWait(lfs.currentdir() .. [[/bin/ImageMagick/composite.exe -geometry ]] .. real_w .. "x" .. real_h .. "+" .. real_x .. "+" .. real_y .. [[ "]] .. fullpath .. [[" "]] .. output_dir .. [[/new_ui_icon_equipment.png" "]] .. output_dir .. [[/new_ui_icon_equipment.png"]],"", "Hide UseErrorLevel")
 					end
 				end
-				
+				for _section,v in pairs (sections_by_alias[alias]) do
 				if (overwrite == true and sec ~= "___upgr_icon1" and sec ~= "___upgr_icon2") then 
-					action_save_section_to_system_ltx(gamedata_dir.."\\configs",{section=sec,x=x-1,y=y-1,w=w,h=h})
+						action_save_section_to_system_ltx(gamedata_dir.."\\configs",{section=_section,x=x-1,y=y-1,w=w,h=h})
+					end 
+					sections_by_alias[alias][_section] = nil
 				end
 			else
-				list[sec] = nil
+				for _section,v in pairs (sections_by_alias[alias]) do
+					sections_by_alias[alias][_section] = nil
+				end
 				c = c + 1
 				log("Failed to find free space on canvas! Use a larger canvas size! [%s] %s",sec,fullpath)
 			end
 		else
-			list[sec] = nil
+			for _section,v in pairs (sections_by_alias[alias]) do
+				sections_by_alias[alias][_section] = nil
+			end
 			c = c + 1
 			log("Failed to get valid width and/or height! [%s] %s",sec,fullpath)
 		end
@@ -182,21 +195,23 @@ function action_repack_ui_equipment_icons(index)
 		RunWait(lfs.currentdir() .. [[/bin/ImageMagick/convert.exe -size ]] .. canvas_size .. [[ xc:none canvas_ui_icon_equipment.png]]," ", "Hide UseErrorLevel")
 	end
 	
-	recurse_subdirectories_and_execute(input_dir,{"png"},make_list)
+	--print("before makelist")
+	recurse_subdirectories_and_execute(input_dir,{"png"},make_list,ltx)
+	--print("after makelist")
 	
 	if (max_count == 0) then
 		Msgbox("Failed to make a list using input directory and shared.ltx!")
 		return
 	end 
 	
+	--print_table(icon_sections_list,"___",true)
+	
 	Gui("2:Destroy")
 	Gui("2:Show", "w1024 h768", "ui_equipment_icon")
 	Gui("2:+0x300000")
-	Gui("2:+LastFound")
 	GroupAdd("SpriteSheet","ui_equipment_icon")
 	
-	local sort_by_size = {w=1,h=1}
-	order_by_class_and_execute(ini,icon_sections_list,make_composite,sort_by_size)
+	order_by_class_and_execute(ini,sections_by_alias,make_composite)
 	
 	GuiControl("", "RepackProgress"..index, "0")
 	ahkFunction("UpdateScrollBars","2","1024","768")
