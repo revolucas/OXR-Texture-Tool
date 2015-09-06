@@ -1,0 +1,10 @@
+*.tmp
+*.backup
+*.bak
+*.bkp
+*.xr
+.cmfid_gamedata
+errors.log
+xray_sections.ltx
+coc_unpacked
+vanilla_unpacked
