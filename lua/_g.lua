@@ -200,7 +200,7 @@ function file_to_table(fname,parent,simple)
 				t = str_explode(line,";")
 				t = str_explode(t[1],[["]])
 
-				if (simple ~= true and parent ~= nil) then
+				if (simple ~= true and parent ~= nil and file_exists(get_path(fname)..t[2])) then
 					file_to_table(get_path(fname)..t[2],parent,simple)
 				end
 			elseif (startsWith(line, "[")) then

@@ -80,17 +80,17 @@ function action_repack_ui_equipment_icons(index)
 			if (k ~= "_suggested_x" and k ~= "_suggested_y" and k ~= "_grid_width" and k ~= "_grid_height") then
 				if not (sections_by_alias[alias]) then 
 					sections_by_alias[alias] = {}
-			end
+				end
 		
 				if (alias_by_section[k] and sections_by_alias[alias_by_section[k]]) then 
 					sections_by_alias[alias_by_section[k]][k] = nil
-		end
+				end
 		
 				alias_by_section[k] = alias
 				sections_by_alias[alias][k] = {p=p,fn=fn,ltx=ltx}		
 			
-		max_count = max_count + 1
-	end
+				max_count = max_count + 1
+			end
 		end
 	end
 	

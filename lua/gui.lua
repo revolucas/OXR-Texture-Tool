@@ -107,6 +107,9 @@ function initialize_gui()
 			-- Edit
 			Gui("Add","Edit","x32 w260 h20 vInputMergeDir" .. i .. " y" .. (59+y_offset),"") -- Edit Input Directory
 
+			-- Check
+			---Gui("Add","CheckBox","x205 w130 h20 vPriorityTextures" .. i .. " y" .. (80+y_offset),"Priority Textures")
+			
 			y_offset = y_offset + 55
 		end	
 	
