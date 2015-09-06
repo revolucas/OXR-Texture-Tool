@@ -7,6 +7,7 @@ This tools purpose is to unpack ui_icon_equipment.dds into separate individual i
 be manipulated individually or merged more easily. This tool is capable of creating a new sprite sheet
 using the unpacked icons and writing the new geometry values (w,h,x,y) into the system configs. It also
 allows you to merge up to 4 existing unpacked ui_icon_equipment directories into a single sheet.
+Stalker Icon Editor, aka SIE is also included and can be launched from the GUI.
 
 
 Unpacking:
