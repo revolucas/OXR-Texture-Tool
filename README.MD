@@ -48,7 +48,7 @@ The source is all here It was created using AHK (ANSI 32-bit) and lua, and is co
 	
 ###### Options:
 1. *Draft Mode* - Will generate a mock-up of what the final new_ui_icon_equipment will look like but it will not create the final image.
-2. *Overwrite System.ltx* - This will save the new geometry (inv_grid_width, inv_grid_x, etc.) for all the sections listed under the alias name in the shared.ltx. This option also works in Draft Mode, so be careful.
+2. *Overwrite System.ltx* - This will save the new geometry (inv_grid_width, inv_grid_x, etc.) for all the sections listed under the alias name in the shared.ltx. This option also works intentionally with Draft Mode, so be careful.
 3. *Ignore Suggested Geometry* - This will ignore the _suggested_x and _suggested_y values in the shared.ltx and use a sorting algorithm to place icons by size and by engine class. This should actually be faster.
 		
 ###### Tips:
