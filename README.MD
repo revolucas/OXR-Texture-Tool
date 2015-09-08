@@ -8,6 +8,19 @@ using the unpacked icons and writing the new geometry values (w,h,x,y) into the 
 allows you to merge up to 4 existing unpacked ui_icon_equipment directories into a single sheet.
 Stalker Icon Editor, aka SIE is also included and can be launched from the GUI.
 
+The source is all here It was created using AHK (ANSI 32-bit) and lua, and is completely standalone so no need to have lua or AHK installed. Anyone is welcome to fork and modify it for their own purposes. The launcher.exe should be the latest compilation of launcher.ahk. It's just mainly here for those that do not know how to use AHK.
+
+##### Example Usages:
+1. Say you create a mod, such as a weapon mod or an item mod with additional icons. If you want your mod to be mergeable into different mods, it is hell for the person who downloads the mod to merge your icons into their existing ui_icon_equipment.dds. That is where this program comes in. Simply create and package your mod like normal. But then you can unpack the ui_icon_equipment.dds and keep [i]only[/i] the icons you added written in shared.ltx and the individual icons. Then you can redistribute the unpacked icons along side your mod so that the person who is using your mod can merge your icons into theirs. Here is an example with OWR3:
+[CoC icons before](http://www.epicstalker.com/uploads/stalker/misc/coc_ui_icon_equipment.png)
+[CoC icons after](http://www.epicstalker.com/uploads/stalker/misc/owr_ui_icon_equipment.png)
+
+ This was a single click of a button! And all inv_grid_x, inv_grid_y, inv_grid_width and inv_grid_height were updated automatically in the output gamedata directory! Magic!
+
+ You can get the OWR3 package I've used from the mod section of the CoP subforum, to see how you should set up package to be merged into another project: http://forum.epicstalker.com/viewtopic.php?f=8&p=4682#p4682
+
+2. Another possible use is to simply make more room by repacking your icons. The algorithm sorts by cell size, X-Ray engine class and alphabetically. So there is less likely to be unused space allowing you to fit more icons onto the sheet.
+
 
 ##### Unpacking:
 ###### How-to:
@@ -25,6 +38,7 @@ Stalker Icon Editor, aka SIE is also included and can be launched from the GUI.
 2. You can also change the suggested_x and suggested_y values. The algorithm will try to prioritize the icon in this location first.
 3. If you want to add a new item for a repack, simply create a new directory (The name doesn't matter). Then add a new section in shared.ltx with your new item section and your preferred x and y values.	
 4. Unpacking creates a xray_sections.ltx which may be useful for other uses. These are all the valid item sections the script has data-mined from system.ltx.
+
 		
 ##### Repacking:
 ###### How-to:
@@ -41,6 +55,11 @@ Stalker Icon Editor, aka SIE is also included and can be launched from the GUI.
 ###### Tips:
 1. If you added a new icon or simply assign a new item section to an alias in the *shared.ltx* you must remember that the output gamedata must have this new section too so that it can update it's geometry values (w,h,x,y)
 2. You might need to adjust upgrade_icon positions manually if they change, through *gamedata\configs\ui\texture_descr\ui_icon_equipment.xml*. However, it is soft-coded in the scripts to try to place them in same *x* and *y* coordinates as the vanilla game.
+3. I strongly suggest you backup your *gamedata\configs\* directory before doing a repack or merge even though it is unlikely for this program to ruin your gamedata.
+
+###### Issues:
+1. The final output of new_ui_icon_equipment is in .png format because of a quality issue when using ImageMagick to convert the png to dxt5 dds.
+
 		
 ##### Merge:
 ###### How-to:
@@ -53,8 +72,10 @@ Stalker Icon Editor, aka SIE is also included and can be launched from the GUI.
 1. Priority is important. This is the order in which conflicts are resolved. If source A and source B have the same alias, source A's icon and settings in the shared.ltx will be used.
 	
 ###### Issues:
-1. This tool isn't perfect. If an identical texture from two different *ui_icon_equipment.dds* come from sections of dissimilar names it's possible you can end up with duplicates on the sheet. You will have to manually fix this yourself. Simply fix this by removing one of the textures and removing it's information from the shared.ltx. Then add the section(s) to the priority 1 *shared.ltx*.
+1. The tool is not perfect. Sometimes you will have to do manual changes to the shared.ltx and rename/add/remove sections and icons to get  a perfect merge. Once you get used to how the process is done this step is also quick. An example is when I merged OWR3 icons with CoC. OWR was missing a quest item section for svu and a ak74u; this created duplicate icons on the sheet. The fix was to simply add these missing sections to owr's shared.ltx for the sections using the icons I wanted them to use.
 2. Sometimes it's best just to manually merge by copying the unpacked icons over the specific icons you want to change. 
-	
+3. Just like repack, the final output of new_ui_icon_equipment is in .png format because of a quality issue when using ImageMagick to convert the png to dxt5 dds.
+
+
 ##### Credits:
 Stalker Icon Editor by *malandrinus*
