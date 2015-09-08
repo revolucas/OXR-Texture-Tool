@@ -34,11 +34,10 @@ The source is all here It was created using AHK (ANSI 32-bit) and lua, and is co
  2. *Upgrade Icon Mode* - This will instead cut textures using *upgr_grid_x*, *upgr_grid_y*, *upgr_grid_width* and *upgr_grid_height* used for the icons in *ui_actor_weapons.dds* and *ui_actor_armors.dds*.
 
 ###### Tips:
-1. Equipment icons that share the same texture will be listed under the same alias. You can add/remove sections.
-2. You can also change the suggested_x and suggested_y values. The algorithm will try to prioritize the icon in this location first.
-3. If you want to add a new item for a repack, simply create a new directory (The name doesn't matter). Then add a new section in shared.ltx with your new item section and your preferred x and y values.	
+1. Unpacked icon names don't matter. It is just an *alias*. What matters is that the section in *shared.ltx* matches the texture name. Equipment icons that share the same texture will be listed under the same *alias*. You can add/remove sections manually if you wish.
+2. You can also change the *_suggested_x* and *_suggested_y* values. The algorithm will try to prioritize the icon in this location first. If not, it will find the first free space according to it's width and height.
+3. If you want to add a new icon for a repack, simply create add your texture to the directory. The name is not important and is only used to link the texture to a section name in *shared.ltx*. Once you create a new section in *shared.ltx* named after the new texture you are able to list new item section. Enter the grid width and height and optionally preferred x and y values.	
 4. Unpacking creates a xray_sections.ltx which may be useful for other uses. These are all the valid item sections the script has data-mined from system.ltx.
-
 		
 ##### Repacking:
 ###### How-to:
