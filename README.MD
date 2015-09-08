@@ -57,4 +57,4 @@ Stalker Icon Editor, aka SIE is also included and can be launched from the GUI.
 2. Sometimes it's best just to manually merge by copying the unpacked icons over the specific icons you want to change. 
 	
 ##### Credits:
-Stalker Icon Editor by malandrinus (Please, someone get him to translate it to English!)
+Stalker Icon Editor by *malandrinus*
