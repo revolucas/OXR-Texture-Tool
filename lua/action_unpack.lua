@@ -48,8 +48,12 @@ function action_unpack_ui_equipment_icons(index)
 		return
 	end
 	
-	sections["___upgr_icon1"] = true
-	sections["___upgr_icon2"] = true
+	local upgr_mode = ahkGetVar("MechanicModeCheckbox"..index) == "1"
+	
+	if not (upgr_mode) then
+		sections["___upgr_icon1"] = true
+		sections["___upgr_icon2"] = true
+	end
 	
 	for sec,v in pairs(sections) do
 		if (sec == "___upgr_icon1") then 
@@ -63,10 +67,17 @@ function action_unpack_ui_equipment_icons(index)
 			x = 50
 			y = 40 * 50
 		else
-			w = ini:GetValue(sec,"inv_grid_width",2,0)*50
-			h = ini:GetValue(sec,"inv_grid_height",2,0)*50
-			x = ini:GetValue(sec,"inv_grid_x",2,0)*50
-			y = ini:GetValue(sec,"inv_grid_y",2,0)*50
+			if (upgr_mode) then 
+				w = ini:GetValue(sec,"upgr_icon_width",2,0)
+				h = ini:GetValue(sec,"upgr_icon_height",2,0)
+				x = ini:GetValue(sec,"upgr_icon_x",2,0)
+				y = ini:GetValue(sec,"upgr_icon_y",2,0)
+			else
+				w = ini:GetValue(sec,"inv_grid_width",2,0)*50
+				h = ini:GetValue(sec,"inv_grid_height",2,0)*50
+				x = ini:GetValue(sec,"inv_grid_x",2,0)*50
+				y = ini:GetValue(sec,"inv_grid_y",2,0)*50
+			end
 		end
 		
 		if not (alias[w]) then 
@@ -97,10 +108,17 @@ function action_unpack_ui_equipment_icons(index)
 		end
 
 		ltx:SetValue(alias[w][h][x][y],sec,"")
-		ltx:SetValue(alias[w][h][x][y],"_suggested_x",x/50)
-		ltx:SetValue(alias[w][h][x][y],"_suggested_y",y/50)
-		ltx:SetValue(alias[w][h][x][y],"_grid_width",w/50)
-		ltx:SetValue(alias[w][h][x][y],"_grid_height",h/50)
+		if (upgr_mode) then 
+			ltx:SetValue(alias[w][h][x][y],"_suggested_x",x/150)
+			ltx:SetValue(alias[w][h][x][y],"_suggested_y",y/150)
+			ltx:SetValue(alias[w][h][x][y],"_grid_width",w/150)
+			ltx:SetValue(alias[w][h][x][y],"_grid_height",h/150)
+		else
+			ltx:SetValue(alias[w][h][x][y],"_suggested_x",x/50)
+			ltx:SetValue(alias[w][h][x][y],"_suggested_y",y/50)
+			ltx:SetValue(alias[w][h][x][y],"_grid_width",w/50)
+			ltx:SetValue(alias[w][h][x][y],"_grid_height",h/50)
+		end
 		
 		count = count + 1
 		GuiControl("", "UnpackProgress"..index, tostring( (count/max_count)*100 ) )

@@ -27,6 +27,7 @@ function initialize_gui()
 		
 			-- Check
 			Gui("Add","CheckBox","x432 w280 h20 vOverwriteCheckbox" .. i .. " y" .. (115+y_offset),"Overwrite Existing")
+			Gui("Add","CheckBox","x432 w280 h20 vMechanicModeCheckbox" .. i .. " y" .. (135+y_offset),"Upgrade Icon mode")
 			
 			-- Progress
 			Gui("Add","Progress","vUnpackProgress" .. i .. " x322 w100 h20 y" .. (89+y_offset), "0")
