@@ -102,10 +102,9 @@ function action_merge_ui_equipment_icons()
 				
 				alias_by_section[k] = alias
 				sections_by_alias[alias][k] = {p=p,fn=fn,ltx=ltx}		
-			
-				max_count = max_count + 1
 			end
 		end
+		max_count = max_count + 1
 	end
 	
 	local c = 0
@@ -176,13 +175,29 @@ function action_merge_ui_equipment_icons()
 				
 				if not (first) then
 					if not (draft_only) then
-						RunWait(lfs.currentdir() .. [[/bin/ImageMagick/composite.exe -geometry ]] .. real_w .. "x" .. real_h .. "+" .. real_x .. "+" .. real_y .. [[ "]] .. fullpath .. [[" canvas_ui_icon_equipment.png "]] .. output_dir .. [[/new_ui_icon_equipment.png"]]," ", "Hide UseErrorLevel")
+						local pid = RunWait(lfs.currentdir() .. [[/bin/ImageMagick/composite.exe -geometry ]] .. real_w .. "x" .. real_h .. "+" .. real_x .. "+" .. real_y .. [[ "]] .. fullpath .. [[" canvas_ui_icon_equipment.png "]] .. output_dir .. [[/new_ui_icon_equipment.png"]]," ", "Hide UseErrorLevel")
 					end
+					if not (pid) then
+						Msgbox("Failed to launch bin\\ImageMagick\\convert.exe! Add it to exceptions for Anti-virus!")
+						return
+					end
+					WinWaitClose("ahk_pid " .. pid)
 					first = true
 				else 
 					if not (draft_only) then
-						RunWait(lfs.currentdir() .. [[/bin/ImageMagick/composite.exe -geometry ]] .. real_w .. "x" .. real_h .. "+" .. real_x .. "+" .. real_y .. [[ "]] .. fullpath .. [[" "]] .. output_dir .. [[/new_ui_icon_equipment.png" "]] .. output_dir .. [[/new_ui_icon_equipment.png"]],"", "Hide UseErrorLevel")
+						local pid = RunWait(lfs.currentdir() .. [[/bin/ImageMagick/composite.exe -geometry ]] .. real_w .. "x" .. real_h .. "+" .. real_x .. "+" .. real_y .. [[ "]] .. fullpath .. [[" "]] .. output_dir .. [[/new_ui_icon_equipment.png" "]] .. output_dir .. [[/new_ui_icon_equipment.png"]],"", "Hide UseErrorLevel")
+						if not (pid) then
+							Msgbox("Failed to launch bin\\ImageMagick\\convert.exe! Add it to exceptions for Anti-virus!")
+							return
+						end
+						WinWaitClose("ahk_pid " .. pid)
 					end
+				end
+				local ErrorLevel = ahkGetVar("ErrorLevel")
+				local err = ahkGetVar("A_LastError")
+				if (ErrorLevel ~= "0" and err ~= "0") then
+					Msgbox("System Error Code: "..err .. "\nErrorLevel="..ErrorLevel.."\ninput=" .. fullpath .. "\nfilename="..output_dir)
+					return
 				end
 				for _section,v in pairs (sections_by_alias[alias]) do
 					if (overwrite == true and sec ~= "___upgr_icon1" and sec ~= "___upgr_icon2") then
@@ -208,7 +223,12 @@ function action_merge_ui_equipment_icons()
 	end
 	
 	if not (draft_only) then
-		RunWait(lfs.currentdir() .. [[/bin/ImageMagick/convert.exe -size ]] .. canvas_size .. [[ xc:none canvas_ui_icon_equipment.png]]," ", "Hide UseErrorLevel")
+		local pid = RunWait(lfs.currentdir() .. [[/bin/ImageMagick/convert.exe -size ]] .. canvas_size .. [[ xc:none canvas_ui_icon_equipment.png]]," ", "Hide UseErrorLevel")
+		if not (pid) then
+			Msgbox("Failed to launch bin\\ImageMagick\\convert.exe! Add it to exceptions for Anti-virus!")
+			return
+		end
+		WinWaitClose("ahk_pid " .. pid)
 	end
 	
 	--print("before makelist")
