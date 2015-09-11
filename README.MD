@@ -78,3 +78,7 @@ The source is all here It was created using AHK (ANSI 32-bit) and lua, and is co
 
 ##### Credits:
 Stalker Icon Editor by *malandrinus*
+
+##### Frequently Asked Questions:
+ Q: When I Unpack, no icons show up in the output folder but sections are written to shared.ltx, how do I fix this?
+ A: Some anti-malware or Anti-virus might silently fail Shell Execute calls to ImageMagick. Either disable this software or add all the .exes found in /bin to exceptions list. Some applications like "Software-restriction Policy" will need to be unlocked/disabled during your usage of the tool.
