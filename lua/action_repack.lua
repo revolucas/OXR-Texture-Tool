@@ -186,7 +186,7 @@ function action_repack_ui_equipment_icons(index)
 				end
 				for _section,v in pairs (sections_by_alias[alias]) do
 					if (overwrite == true and sec ~= "___upgr_icon1" and sec ~= "___upgr_icon2") then 
-						action_save_section_to_system_ltx(gamedata_dir.."\\configs",{section=_section,x=x-1,y=y-1,w=w,h=h})
+						action_save_repack(gamedata_dir.."\\configs",{section=_section,x=x-1,y=y-1,w=w,h=h})
 					end 
 					sections_by_alias[alias][_section] = nil
 				end
