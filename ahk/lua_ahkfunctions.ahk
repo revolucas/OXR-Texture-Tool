@@ -92,6 +92,7 @@ lua_registerAhkFunction(ByRef l)
    lua_register(l, "SetTitleMatchMode", RegisterCallback("SetTitleMatchMode","C"))
    lua_register(l, "SetWinDelay", RegisterCallback("SetWinDelay","C"))
    lua_register(l, "SetWorkingDir", RegisterCallback("SetWorkingDir","C"))
+   lua_register(l, "GetWorkingDir", RegisterCallback("GetWorkingDir","C"))
    lua_register(l, "Shutdown", RegisterCallback("Shutdown","C"))
    lua_register(l, "Sleep", RegisterCallback("sleep","C"))
    lua_register(l, "Sort", RegisterCallback("Sort","C"))
@@ -1184,6 +1185,13 @@ SetWorkingDir(L)
    return 0
 }
 
+GetWorkingDir(L)
+{
+	lua_pushstring(L, A_WorkingDir)
+
+   return, 1
+}
+
 Shutdown(L)
 {
    arg1 := lua_tostring(L, 1)
@@ -1999,6 +2007,7 @@ Random(L) {
 
 RegRead(L)
 {
+	SetRegView 64
    RootKey := lua_tostring(L, 1)
    SubKey := lua_tostring(L, 2)
    ValueName := lua_tostring(L, 3)
@@ -2041,11 +2050,11 @@ RunWaitMany(L) {
    ; Send the commands to execute, separated by newline
    exec.StdIn.WriteLine(commands "`nexit")  ; Always exit at the end!
    ; Read and return the output of all commands
-   
+
    v := exec.StdOut.ReadAll()
-   
+
    lua_pushstring(L,v)
-   
+
    Return, 1
 }
 
