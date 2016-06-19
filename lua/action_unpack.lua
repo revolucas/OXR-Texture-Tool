@@ -103,7 +103,7 @@ function action_unpack_ui_equipment_icons(index)
 			if (exists ~= true or overwrite) then
 				local geo = tostring(w) .. "x" .. tostring(h) .. "+" .. tostring(x) .. "+" .. tostring(y)
 				--os.capture(lfs.currentdir() .. [[/bin/ImageMagick/convert.exe ui_icon_equipment.dds -crop ]] .. geo .. " " .. output_dir .. "\\" .. sec .. "\\" .. sec .. ".png")
-				local pid = RunWait(lfs.currentdir() .. [[/bin/ImageMagick/convert.exe "]] .. input_texture .. [[" -crop ]] .. geo .. " " .. fn," ", "Hide UseErrorLevel")
+				local pid = RunWait(lfs.currentdir() .. [[/bin/ImageMagick/convert.exe "]] .. input_texture .. [[" -crop ]] .. geo .. [[ "]] .. fn .. [["]]," ", "Hide UseErrorLevel")
 				if not (pid) then
 					Msgbox("Failed to launch bin\\ImageMagick\\convert.exe! Add it to exceptions for Anti-virus!")
 					return
