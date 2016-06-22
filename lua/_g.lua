@@ -4,7 +4,7 @@ require'lua_extensions'
 require'lfs'
 
 function is_empty(t)
-	for k,v in pairs(t) do 
+	for k,v in pairs(t) do
 		return false
 	end
 	return true
@@ -37,15 +37,16 @@ function printf(msg,...)
 		msg = string.gsub(msg,"%%s",sr)
 	end
 	print(msg)
+	return msg
 end
 
 -- Prints a formated lua table to print_table.txt for debugging purposes
 function print_table(tbl,header,save_to_disk)
-	if not (tbl) then 
+	if not (tbl) then
 		printf("print_table: Table is empty!")
 		return
 	end
-	
+
 	local txt = tostring(header) .. "\n{\n\n"
 	local depth = 1
 
@@ -214,7 +215,7 @@ function file_to_table(fname,parent,simple)
 				end
 
 				root[sec] = {}
-				
+
 				if (t[2]) then
 					root[sec]["_____link"] = t[2]
 					if (simple ~= true) then
@@ -290,8 +291,8 @@ end
 function cIniFile:GetKeys(sec)
 	if (self.root and self.root[sec]) then
 		t={}
-		for k,v in pairs(self.root[sec]) do 
-			if (k ~= "_____link") then 
+		for k,v in pairs(self.root[sec]) do
+			if (k ~= "_____link") then
 				t[k] = v
 			end
 		end
@@ -331,7 +332,7 @@ function cIniFile:KeyExist(sec,key)
 end
 
 -- Save ini by preserving original file. Cannot insert new keys or sections
-function cIniFile:SaveExt()
+function cIniFile:SaveExt(bInsert)
 	local t,sec,comment
 	local str = ""
 
@@ -346,10 +347,52 @@ function cIniFile:SaveExt()
 	for ln in io.lines(self.fname) do
 		ln = trim(ln)
 		if (startsWith(ln,"[")) then
+
+--[[
+			-- inject new fields that previously didn't exist
+			if (bInsert and sec and self.root[sec]) then
+				for k,v in pairs(self.root[sec]) do
+					if (k ~= "_____link") then
+						str = str .. addTab(k,40) .. " = " .. tostring(v) .. "\n"
+					end
+				end
+			end
+--]]
+
 			t = str_explode(ln,";")
 			t = str_explode(t[1],":")
 
 			sec = string.sub(t[1],2,-2)
+
+			--[[
+
+			local scopes = 	{
+				"pso",
+				"acog",
+				"eot",
+				"c-more",
+				"ekp",
+				"1p29",
+				"ac11090",
+				"pu",
+			}
+
+			for __i=1,#scopes do
+				local s = "_".. scopes[__i]
+				if ( sec:sub( -(s:len()) ) == s ) then
+					bInsert = true
+					self.root[sec]["1icon_layer"] = scopes[__i]
+					self.root[sec]["1icon_layer_scale"] = "0.90"
+					self.root[sec]["1icon_layer_x"] = "0"
+					self.root[sec]["1icon_layer_x"] = "0"
+
+					--str = str .. addTab("1icon_layer",40) .. " = " .. tostring(scopes[__i]) .. "\n"
+					--str = str .. addTab("1icon_layer_scale",40) .. " = " .. tostring("0.90") .. "\n"
+					--str = str .. addTab("1icon_layer_x",40) .. " = " .. tostring(0) .. "\n"
+					--str = str .. addTab("1icon_layer_y",40) .. " = " .. tostring(0) .. "\n"
+				end
+			end
+			--]]
 		elseif (not startsWith(ln,";") and self.root[sec]) then
 			comment = string.find(ln,";")
 			comment = comment and string.sub(ln,comment) or ""
@@ -366,6 +409,7 @@ function cIniFile:SaveExt()
 				else
 					ln = addTab(t[1],40) .. " = " .. tostring(self.root[sec][t[1]]) .. comment
 				end
+				--self.root[sec][t[1]] = nil
 			end
 		end
 		str = str .. ln .. "\n"
@@ -379,49 +423,59 @@ end
 function cIniFile:Save()
 	local _s = {}
 	_s.__order = {}
-	
+
+	local function addTab(s,n)
+		local l = string.len(s)
+		for i=1,n-l do
+			s = s .. " "
+		end
+		return s
+	end
+
 	for section,tbl in pairs(self.root) do
 		table.insert(_s.__order,section)
-		if not (_s[section]) then 
+		if not (_s[section]) then
 			_s[section] = {}
 		end
-		for k,v in pairs(tbl) do 
+		for k,v in pairs(tbl) do
 			table.insert(_s[section],k)
 		end
 	end
-	
+
 	table.sort(_s.__order)
-	
-	for i,section in pairs(_s.__order) do 
+
+	for i,section in pairs(_s.__order) do
 		table.sort(_s[section])
-	end 
-	
+	end
+
 	local str = ""
-	
+
 	local first
 	for i,section in pairs(_s.__order) do
 		if not (first) then
 			str = str .. "[" .. section .. "]"
 			first = true
-		else 
+		else
 			str = str .. "\n[" .. section .. "]"
 		end
 
-		if (self.root["_____link"]) then 
-			str = str .. ":" .. self.root["_____link"] .. "\n"
-		else 
+		if (self.root[section]["_____link"]) then
+			str = str .. ":" .. self.root[section]["_____link"] .. "\n"
+		else
 			str = str .. "\n"
-		end 
+		end
 
 		for ii, key in pairs(_s[section]) do
-			val = self.root[section][key]
-			if (val == "") then
-				str = str .. key .. "\n"
-			else
-				str = str .. key .. " = " .. tostring(val) .. "\n"
+			if (key ~= "_____link") then
+				val = self.root[section][key]
+				if (val == "") then
+					str = str .. addTab(key,40) .. " = \n"
+				else
+					str = str .. addTab(key,40) .. " = " .. tostring(val) .. "\n"
+				end
 			end
-		end 
-	end 
+		end
+	end
 
 	local cfg = io.open(self.fname,"w+")
 	cfg:write(str)
@@ -560,7 +614,16 @@ end
 function log_flush()
 	gErrorLog:close()
 	gErrorLog = io.open("errors.log","a+")
-end	
+end
 
+function table_merge(t1,t2,not_if_exists)
+	for k,v in pairs(t2) do
+		if (k ~= "_____link") then
+			if (not_if_exists ~= true or t1[k] == nil) then
+				t1[k] = v
+			end
+		end
+	end
+end
 
 
