@@ -82,3 +82,9 @@ Stalker Icon Editor by *malandrinus*
 ##### Frequently Asked Questions:
  * Q: When I Unpack, no icons show up in the output folder but sections are written to shared.ltx, how do I fix this?
  * A: Some anti-malware or Anti-virus might silently fail Shell Execute calls to ImageMagick. Either disable this software or add all the .exes found in /bin to exceptions list. Some applications like "Software-restriction Policy" will need to be unlocked/disabled during your usage of the tool.
+
+####Donations
+---------
+I devote a mind-blowing amount of hours to create free content, provide support and manage an ad-free community website and group projects. If you would like to support me in my passion for sharing and creating free software, mods and video games, I would really appreciate it.
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=U9XUD5PFHYR48)
