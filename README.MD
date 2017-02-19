@@ -1,5 +1,4 @@
 #Open X-Ray Icon Texture Tool
-by *Alundaio*
 
 ##### Summary:
 This tools purpose is to unpack ui_icon_equipment.dds into separate individual icons so that they can 
